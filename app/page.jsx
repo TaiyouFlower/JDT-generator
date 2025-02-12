@@ -18,7 +18,7 @@ export default function Home() {
       setGeneratedCode(response.data.wordpress_code);
     } catch (error) {
       console.error(error);
-      alert("An error occurred lolkek. Please try again.");
+      alert("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -57,21 +57,35 @@ export default function Home() {
       // Store compressed image URLs
       setCompressedImages(response.data.compressedImages);
       setUploadedImage(true);
-      console.log(compressedImages);
-      console.log(compressedImages["600x600-webp"]);
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Failed to upload image. Please try again.");
     }
   };
 
-  const handleDownload = (imageKey) => {
-    console.log(compressedImages);
-    console.log(imageKey);
-    console.log(compressedImages[imageKey]);
+  const handleDownload = async (imageKey) => {
     if (compressedImages[imageKey]) {
-      const downloadUrl = compressedImages[imageKey];
-      window.open(downloadUrl, "_blank");
+      try {
+        const imageUrl = compressedImages[imageKey];
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+  
+        const a = document.createElement("a");
+        a.href = url;
+  
+        // Extract filename from the URL dynamically
+        const filename = imageUrl.split("/").pop(); 
+        a.download = filename; // Use extracted filename
+  
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Download error:", error);
+        alert("Failed to download image.");
+      }
     } else {
       alert("Image not available for download.");
     }
@@ -134,7 +148,7 @@ export default function Home() {
         <div>
           <h3>Compressed Images:</h3>
           <button
-            onClick={() => handleDownload("1200x1200-jpg")}
+            onClick={() => handleDownload("1200x1200-jpg", "jpg")}
             style={{
               margin: "0.5rem",
               padding: "0.5rem 1rem",
@@ -148,7 +162,7 @@ export default function Home() {
             Download 1200x1200 JPG
           </button>
           <button
-            onClick={() => handleDownload("1200x1200-webp")}
+            onClick={() => handleDownload("1200x1200-webp", "webp")}
             style={{
               margin: "0.5rem",
               padding: "0.5rem 1rem",
@@ -162,7 +176,7 @@ export default function Home() {
             Download 1200x1200 WEBP
           </button>
           <button
-            onClick={() => handleDownload("600x600-jpg")}
+            onClick={() => handleDownload("600x600-jpg", "jpg")}
             style={{
               margin: "0.5rem",
               padding: "0.5rem 1rem",
@@ -176,7 +190,7 @@ export default function Home() {
             Download 600x600 JPG
           </button>
           <button
-            onClick={() => handleDownload("600x600-webp")}
+            onClick={() => handleDownload("600x600-webp", "webp")}
             style={{
               margin: "0.5rem",
               padding: "0.5rem 1rem",
