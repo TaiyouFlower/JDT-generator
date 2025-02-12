@@ -12,7 +12,7 @@ export default function Home() {
   const handleGenerate = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post("http://localhost:8000/generate/", {
+      const response = await axios.post("http://jdt-script.up.railway.app/generate/", {
         text: inputText,
       });
       setGeneratedCode(response.data.wordpress_code);
@@ -45,7 +45,7 @@ export default function Home() {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://localhost:8000/upload/",
+        "https://jdt-script.up.railway.app/upload/",
         formData,
         {
           headers: {
